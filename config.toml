@@ -1,81 +1,19 @@
-# Parsec Configuration File
-
-# (Required) Core settings apply to the service as a whole rather than to individual components within it.
 [core_settings]
-# Size of the thread pool used for processing requests. Defaults to the number of processors on
-# the machine.
-#thread_pool_size = 8
+# The CI already timestamps the logs
+log_timestamp = false
 
-# Duration of sleep when the connection pool is empty. This can limit the response
-# times for requests and so should be set to a low number. Default value is 10.
-#idle_listener_sleep_duration = 10 # in milliseconds
-
-# Log level to be applied across the service. Can be overwritten for certain modules which have the same
-# configuration key. Possible values: "debug", "info", "warn", "error", "trace"
-#log_level = "warn"
-
-# Control whether log entries contain a timestamp.
-#log_timestamp = false
-
-# Decide how large (in bytes) request bodies can be before they get rejected automatically.
-# Defaults to 1MB.
-#body_len_limit = 1048576
-
-# (Required) Configuration for the service IPC listener component.
 [listener]
-# (Required) Type of IPC that the service will support.
 listener_type = "DomainSocket"
+# The timeout needs to be smaller than the test client timeout (five seconds) as it is testing
+# that the service does not hang for very big values of body or authentication length.
+timeout = 3000 # in milliseconds
 
-# (Required) Timeout of the read and write operations on the IPC channel. After the
-# timeout expires, the connection is dropped.
-timeout = 200 # in milliseconds
-
-# (Required) Configuration for the components managing key info for providers.
-# Defined as an array of tables: https://github.com/toml-lang/toml#user-content-array-of-tables
 [[key_manager]]
-# (Required) Name of the key info manager. Used to tie providers to the manager supporting them.
 name = "on-disk-manager"
-
-# (Required) Type of key info manager to be used.
 manager_type = "OnDisk"
 
-# Path to the location where the mapping will be persisted (in this case, the filesystem path)
-#store_path = "./mappings"
-
-# (Required) Provider configurations.
-# Defined as an array of tables: https://github.com/toml-lang/toml#user-content-array-of-tables
 [[provider]]
-# (Required) Type of provider.
-provider_type = "MbedCrypto"
-
-# (Required) Name of key info manager that will support this provider.
+provider_type = "Tpm"
 key_info_manager = "on-disk-manager"
-
-# Example of a PKCS 11 provider configuration
-#[[provider]]
-#provider_type = "Pkcs11"
-#key_info_manager = "on-disk-manager"
-# (Required for this provider) Path to the location of the dynamic library loaded by this provider.
-# For the PKCS 11 provider, this library implements the PKCS 11 API on the target platform.
-#library_path = "/usr/local/lib/softhsm/libsofthsm2.so"
-# (Required) PKCS 11 slot that will be used by Parsec.
-#slot_number = 123456789
-# (Optional) User pin for authentication with the specific slot. If not set, no authentication will
-# be used.
-#user_pin = "123456"
-
-# Example of a TPM provider configuration
-#[[provider]]
-#provider_type = "Tpm"
-#key_info_manager = "on-disk-manager"
-# (Required) TPM TCTI device to use with this provider. Options are:
-# - "device": uses the TPM device on /dev/tpm0
-# - "mssim": uses the simulation TPM with the socket
-# - "tabrmd": uses the TPM2 Access Broker & Resource Management Daemon
-#tcti = "mssim"
-# (Required) Authentication value for performing operations on the TPM Owner Hierarchy. The string can
-# be empty, however we strongly suggest that you use a secure passcode.
-# To align with TPM tooling, PARSEC allows "owner_hierarchy_auth" to have a prefix indicating a string value,
-# e.g. "str:password", or to represent a string version of a hex value, e.g. "hex:1a2b3c". If no prefix is
-# provided, the value is considered to be a string.
-#owner_hierarchy_auth = "password"
+tcti = "mssim"
+owner_hierarchy_auth = ""

@@ -9,7 +9,7 @@
     # When compiling natively
     [mbed_config.native]
     # The compiler to use when building the Mbed Crypto library
-    # mbed_compiler = "clang"
+    mbed_compiler = "gcc"
     # The archiver to use when building the Mbed Crypto library
     # mbed_archiver = "ar"
 
