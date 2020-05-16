@@ -1,0 +1,19 @@
+export PROJECTS_FOLDER=/sharedhome/$USER
+
+Run tmp server
+export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig
+cd $PROJECTS_FOLDER/ibmtpm1332/src
+./tpm_server &
+
+Run tpm2_startup
+cd $PROJECTS_FOLDER/tpm2-tools/
+tpm2_startup -c -T mssim
+
+Run parsec with tpm-provider
+cd $PROJECTS_FOLDER/parsec
+RUST_LOG=info cargo run --features tpm-provider
+
+
+Run PArsec tests with tom-provider by openning a new shell and running:
+cd $PROJECTS_FOLDER/parsec/e2e_tests
+cargo test normal_tests
